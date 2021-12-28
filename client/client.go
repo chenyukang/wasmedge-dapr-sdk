@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"google.golang.org/protobuf/types/known/emptypb"
 
 	pb "github.com/dapr/dapr/pkg/proto/runtime/v1"
 )

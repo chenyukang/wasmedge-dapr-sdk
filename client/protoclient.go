@@ -12,6 +12,8 @@ import (
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
+var _             pb.DaprClient = (*defaultClientImpl)(nil)
+
 type action int32
 
 const (
@@ -47,6 +49,18 @@ func (c *clientImpl) DeleteState(ctx context.Context, in *pb.DeleteStateRequest,
 }
 
 type defaultClientImpl struct{}
+
+func (c *defaultClientImpl) QueryStateAlpha1(ctx context.Context, in *pb.QueryStateRequest, opts ...grpc.CallOption) (*pb.QueryStateResponse, error) {
+	return nil, ErrUnimplemented
+}
+
+func (c *defaultClientImpl) GetConfigurationAlpha1(ctx context.Context, in *pb.GetConfigurationRequest, opts ...grpc.CallOption) (*pb.GetConfigurationResponse, error) {
+	return nil, ErrUnimplemented
+}
+
+func (c *defaultClientImpl) SubscribeConfigurationAlpha1(ctx context.Context, in *pb.SubscribeConfigurationRequest, opts ...grpc.CallOption) (pb.Dapr_SubscribeConfigurationAlpha1Client, error) {
+	return nil, ErrUnimplemented
+}
 
 func (c *defaultClientImpl) InvokeService(ctx context.Context, in *pb.InvokeServiceRequest, opts ...grpc.CallOption) (*v1.InvokeResponse, error) {
 	return nil, ErrUnimplemented
