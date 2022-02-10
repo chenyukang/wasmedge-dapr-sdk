@@ -14,6 +14,15 @@ type host struct {
 	client      dapr.Client
 }
 
+// Host function for writting memory
+func (h *host) writeMem(_ interface{}, mem *wasmedge.Memory, params []interface{}) ([]interface{}, wasmedge.Result) {
+	// write source code to memory
+	pointer := params[0].(int32)
+	mem.SetData(h.fetchResult, uint(pointer), uint(len(h.fetchResult)))
+
+	return nil, wasmedge.Result_Success
+}
+
 // Host function for NewClient
 func (h *host) newClient(_ interface{}, mem *wasmedge.Memory, params []interface{}) ([]interface{}, wasmedge.Result) {
 	client, err := dapr.NewClient()
@@ -93,6 +102,15 @@ func main() {
 	obj := wasmedge.NewImportObject("env")
 
 	h := host{}
+
+	funcWriteType := wasmedge.NewFunctionType(
+		[]wasmedge.ValType{
+			wasmedge.ValType_I32,
+		},
+		[]wasmedge.ValType{})
+	hostWrite := wasmedge.NewFunction(funcWriteType, h.writeMem, nil, 0)
+	obj.AddFunction("write_mem", hostWrite)
+
 	// Add host functions into the import object
 	newClientType := wasmedge.NewFunctionType(
 		[]wasmedge.ValType{},
@@ -113,7 +131,7 @@ func main() {
 		})
 
 	hostNewClientWithPort := wasmedge.NewFunction(newClientWithPortType, h.newClientWithPort, nil, 0)
-	obj.AddFunction("new_client", hostNewClientWithPort)
+	obj.AddFunction("new_client_with_port", hostNewClientWithPort)
 
 	// Add host functions into the import object
 	invokeMethodWithContentType := wasmedge.NewFunctionType(
@@ -142,7 +160,7 @@ func main() {
 	vm.Validate()
 	vm.Instantiate()
 
-	r, _ := vm.Execute("run")
+	r, _ := vm.Execute("run_dapr")
 	fmt.Printf("There are %d 'google' in source code of google.com\n", r[0])
 
 	obj.Release()
