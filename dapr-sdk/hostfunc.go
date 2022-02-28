@@ -12,6 +12,7 @@ import (
 type host struct {
 	fetchResult []byte
 	client      dapr.Client
+	ctx         context.Context
 }
 
 // Host function for writting memory
@@ -25,11 +26,13 @@ func (h *host) writeMem(_ interface{}, mem *wasmedge.Memory, params []interface{
 
 // Host function for NewClient
 func (h *host) newClient(_ interface{}, mem *wasmedge.Memory, params []interface{}) ([]interface{}, wasmedge.Result) {
+	ctx := context.Background()
 	client, err := dapr.NewClient()
 	if err != nil {
 		panic(err)
 	}
 	h.client = client
+	h.ctx = ctx
 	return []interface{}{client}, wasmedge.Result_Success
 }
 
