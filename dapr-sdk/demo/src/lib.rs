@@ -38,7 +38,7 @@ pub unsafe extern "C" fn run_dapr() -> i32 {
     let content_ty_ptr = content_ty.as_bytes().as_ptr();
     let content_ty_len = content_ty.len() as i32;
 
-    let content = "hello".to_string();
+    let content = "hello parameter from wasm".to_string();
     let content_ptr = content.as_bytes().as_ptr();
     let content_len = content.len() as i32;
 

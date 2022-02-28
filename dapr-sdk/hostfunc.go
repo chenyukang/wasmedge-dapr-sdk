@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/http"
 	"os"
+	"unsafe"
 
 	dapr "github.com/dapr/go-sdk/client"
 	"github.com/second-state/WasmEdge-go/wasmedge"
@@ -33,7 +36,7 @@ func (h *host) newClient(_ interface{}, mem *wasmedge.Memory, params []interface
 	}
 	h.client = client
 	h.ctx = ctx
-	return []interface{}{client}, wasmedge.Result_Success
+	return []interface{}{*(*int32)(unsafe.Pointer(&client))}, wasmedge.Result_Success
 }
 
 func (h *host) newClientWithPort(_ interface{}, mem *wasmedge.Memory, params []interface{}) ([]interface{}, wasmedge.Result) {
@@ -92,7 +95,7 @@ func (h *host) InvokeMethodWithContent(_ interface{}, mem *wasmedge.Memory, para
 
 }
 
-func main() {
+func runWasmHandle(writer http.ResponseWriter, reader *http.Request) {
 	fmt.Println("Go: Args:", os.Args)
 	/// Expected Args[0]: program name (./externref)
 	/// Expected Args[1]: wasm file (funcs.wasm)
@@ -159,14 +162,26 @@ func main() {
 
 	vm.RegisterImport(obj)
 
-	vm.LoadWasmFile(os.Args[1])
+	//wasm_file := os.Args[1]
+	wasm_file := "./demo/target/wasm32-wasi/release/demo.wasm"
+
+	vm.LoadWasmFile(wasm_file)
 	vm.Validate()
 	vm.Instantiate()
 
 	r, _ := vm.Execute("run_dapr")
-	fmt.Printf("There are %d 'google' in source code of google.com\n", r[0])
+	fmt.Printf("The parameter len is: %d\n", r[0])
 
 	obj.Release()
 	vm.Release()
 	conf.Release()
+
+	writer.Header().Set("Content-Type", "plain/text")
+	fmt.Fprintf(writer, "%s\n", "invoked wasm file")
+}
+
+func main() {
+	http.HandleFunc("/api/hello", runWasmHandle)
+	println("listen to 8080 ...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
