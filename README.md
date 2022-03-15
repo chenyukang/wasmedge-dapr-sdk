@@ -2,7 +2,7 @@
 
 This project demonstrate calling Dapr Api in WASM format, we can run a wasm file call Dapr Api and get results.
 
-![./doc/dapr-wasm-api.jpg](doc/dapr-wasm-api.jpg)
+![./doc/dapr-wasm-api.jpg](doc/dapr-wasm.png)
 
 ## server 
 
