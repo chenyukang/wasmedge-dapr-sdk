@@ -28,9 +28,3 @@ A wrapper for WasmEdge, which will load wasm file, and invoke Dapr API for wasm
 ./run_hostfunc.sh
 ```
 
-## Invoke API 
-
-```
-curl -v http://127.0.0.1:8080/api/hello
-```
-
