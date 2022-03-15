@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
-	"net/http"
 	"os"
 	"unsafe"
 
@@ -95,7 +93,7 @@ func (h *host) InvokeMethodWithContent(_ interface{}, mem *wasmedge.Memory, para
 
 }
 
-func runWasmHandle(writer http.ResponseWriter, reader *http.Request) {
+func main() {
 	fmt.Println("Go: Args:", os.Args)
 	/// Expected Args[0]: program name (./externref)
 	/// Expected Args[1]: wasm file (funcs.wasm)
@@ -176,12 +174,4 @@ func runWasmHandle(writer http.ResponseWriter, reader *http.Request) {
 	vm.Release()
 	conf.Release()
 
-	writer.Header().Set("Content-Type", "plain/text")
-	fmt.Fprintf(writer, "%s\n", "invoked wasm file")
-}
-
-func main() {
-	http.HandleFunc("/api/hello", runWasmHandle)
-	println("listen to 8080 ...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
 }
