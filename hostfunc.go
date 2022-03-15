@@ -180,8 +180,37 @@ func runWasmHandle(writer http.ResponseWriter, reader *http.Request) {
 	fmt.Fprintf(writer, "%s\n", "invoked wasm file")
 }
 
+func daprClientSendV2(data []byte, w http.ResponseWriter) {
+	ctx := context.Background()
+
+	// create the client
+	client, err := dapr.NewClient()
+	if err != nil {
+		panic(err)
+	}
+
+	content := &dapr.DataContent{
+		ContentType: "text/plain",
+		Data:        data,
+	}
+
+	resp, err := client.InvokeMethodWithContent(ctx, "dapr-demo", "/api/hello", "post", content)
+	if err != nil {
+		panic(err)
+	}
+	log.Printf("dapr-wasmedge-go method api/image has invoked, response: %s", string(resp))
+	fmt.Printf("Image classify result: %q\n", resp)
+	w.Header().Set("Content-Type", "plain/text")
+	fmt.Fprintf(w, "%s", resp)
+}
+
+func testDaprClientV2(w http.ResponseWriter, r *http.Request) {
+	body := "hello"
+	daprClientSendV2([]byte(body), w)
+}
+
 func main() {
-	http.HandleFunc("/api/hello", runWasmHandle)
+	http.HandleFunc("/api/hello", testDaprClientV2)
 	println("listen to 8080 ...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":50001", nil))
 }
