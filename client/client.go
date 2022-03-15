@@ -68,9 +68,9 @@ func testDaprClientV2(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	testDaprClientV1()
+	//testDaprClientV1()
 
-	//http.HandleFunc("/api/hello", testDaprClientV2)
-	//println("listen to 8080 ...")
-	//log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc("/api/hello", testDaprClientV2)
+	println("listen to 8080 ...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
